@@ -1,0 +1,14 @@
+/env1
+/.env
+/.vscode
+__pycache__/
+*.pyc
+*.pyo
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gemini Prompt Engineering</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+  h1 { font-size: 22px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab-btn { padding: 8px 16px; border: 1px solid #ccc; background: #f4f4f4; cursor: pointer; border-radius: 6px; }
+  .tab-btn.active { background: #1a1a1a; color: white; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  label { display: block; margin-top: 12px; font-weight: 600; font-size: 14px; }
+  input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
+  button.submit { margin-top: 16px; padding: 10px 18px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  button.submit:disabled { opacity: 0.6; }
+  pre { background: #f4f4f4; padding: 12px; border-radius: 6px; white-space: pre-wrap; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Gemini Prompt Engineering (FastAPI)</h1>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('single')">PromptTemplate</button>
+  <button class="tab-btn" onclick="showTab('chat')">ChatPromptTemplate</button>
+</div>
+
+<div id="single" class="panel active">
+  <label>Topic</label>
+  <input id="topic" placeholder="e.g. black holes">
+  <label>Tone</label>
+  <input id="tone1" placeholder="e.g. friendly">
+  <label>Length</label>
+  <select id="length">
+    <option>short</option>
+    <option>medium</option>
+    <option>long</option>
+  </select>
+  <button class="submit" onclick="runSingle()">Generate</button>
+</div>
+
+<div id="chat" class="panel">
+  <label>System instruction</label>
+  <input id="system_role" placeholder="e.g. You are a tutor">
+  <label>User message</label>
+  <input id="user_question" placeholder="e.g. Explain recursion">
+  <label>Tone</label>
+  <input id="tone2" placeholder="e.g. strict">
+  <button class="submit" onclick="runChat()">Generate</button>
+</div>
+
+<pre id="output"></pre>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+async function post(url, data) {
+  const body = new URLSearchParams(data);
+  const res = await fetch(url, { method: 'POST', body });
+  return res.json();
+}
+
+async function runSingle() {
+  document.getElementById('output').textContent = 'Loading...';
+  const result = await post('/api/prompt-template', {
+    topic: document.getElementById('topic').value,
+    tone: document.getElementById('tone1').value,
+    length: document.getElementById('length').value,
+  });
+  document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+}
+
+async function runChat() {
+  document.getElementById('output').textContent = 'Loading...';
+  const result = await post('/api/chat-template', {
+    system_role: document.getElementById('system_role').value,
+    user_question: document.getElementById('user_question').value,
+    tone: document.getElementById('tone2').value,
+  });
+  document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+}
+</script>
+
+</body>
+</html>
